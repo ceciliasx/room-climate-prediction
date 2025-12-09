@@ -1,6 +1,7 @@
 # 🌡️ Room Temperature Prediction
 
 Dataset source: https://github.com/IoTsec/Room-Climate-Datasets
+
 This repository contains a regression model for **predicting next-timestamp room temperature**.
 
 ### **Model Inputs**
