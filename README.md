@@ -1,40 +1,55 @@
-# Room Climate Datasets
+# 🌡️ Room Temperature Prediction
 
-Room climate data, i.e., temperature and relative humidity, is supected to leak privacy-sensitive information, e.g., the number of occupants in the room or even the activity of these occupants. We evaluated this privacy threat with an experimental study, in which we measured room climate data while one or two occupant(s) performed a pre-defined sequence of tasks.
+Dataset source: https://github.com/IoTsec/Room-Climate-Datasets
+This repository contains a regression model for **predicting next-timestamp room temperature**.
 
-To encourage further research on IoT privacy issues, we publish our collected sensor data (with groundtruth) as open datasets in this repository. If you refer to these data in a publication, please cite [1].
+### **Model Inputs**
+- Temperature  
+- Relative Humidity  
+- Light Sensor 1  
+- Light Sensor 2  
+Target label: **Temperature of next timestamp** (`TempNext`)
 
-## Publication
+### **Data Preparation**
+- Combined CSV logs into a unified dataset  
+- Checked missing values & datatypes  
+- Added shifted temperature column (`TempNext`)  
+- Train/Val/Test split: **70% / 15% / 15%**  
+- StandardScaler normalization applied  
 
-[1] P. Morgner, C. Müller, M. Ring, B. Eskofier, C. Riess, F. Armknecht, Z. Benenson: Privacy Implications of Room Climate Data. To appear in the Procedings of the European Symposium on Research in Computer Security (ESORICS) 2017, Oslo, Norway, September 11-13, 2017. 
+### **Baseline Model**
+- 2 hidden layers, 64 neurons each  
+- ReLU activation  
+- L2 regularization  
+- Dropout  
+- Optimizer: Adam  
+- Loss: MSE  
 
-## Experimental Design
+### 📉 **Training Analysis**
+Training & validation curves show:
 
-We collected room climate data at three different locations in form of controlled experiments. The locations are denoted as A, B, and C. 
-Each location was eqipped with 3 to 5 room climate sensor nodes at different postions. The floor plan of each location, also including the positions of the sensor nodes, can found in this repository.
+- Rapid improvement in first epochs  
+- Stable convergence  
+- Validation MAE < training MAE → **no overfitting**  
 
-For more details about the experimental design and the collected data, please see Section 4 in our publication [1].
+The model generalizes well.
 
-## Format of Data
+### 🔧 Hyperparameter Tuning
+Adjustments:
+- More neurons  
+- Stronger L2  
+- Higher dropout  
+- Added batch normalization  
 
-The datasets are split according to their location in the directories `datasets-location_X`.
-Each measurement file `room_climate-location_X-measurementYY.csv` contains a series of subsequential room climate measurements. Please note that each measurement file contains measurements of multiple sensor nodes.
+**Result:**  
+Validation MSE increased → tuning **did not improve** performance.
 
-Each measurement consists of following information:
+### 🧪 Test Set Evaluation
+Tuned model:
+- Test MSE: **0.2576**  
+- Test MAE: **0.3594**  
+- R² negative (underperforming)  
 
-`<EID>, <AbsT>, <RelT>, <NID>, <Temp>, <RelH>, <L1>, <L2>, <Occ>, <Act>, <Door>, <Win>`
+The baseline model outperformed the tuned version. Further tuning may be necessary to improve the model's accuracy and generalization. 
 
-* `<EID>`: Entry ID
-* `<AbsT>`: Absolute timestamp [ms]
-* `<RelT>`: Relative timestamp [s]
-* `<NID>`: Node ID
-* Sensor Data:
-  * `<Temp>`: Temperature [°C]
-  * `<RelH>`: Relative Humidity [%]
-  * `<L1>`: Light Sensor 1 (Wavelength) [nm]
-  * `<L2>`: Light Sensor 2 (Wavelength) [nm]
-* Groundtruth:
-  * `<Occ>`: Number of occupants (0, 1, 2)
-  * `<Act>`: Activity of occupant(s) (0 = n/a, 1 = read, 2 = stand, 3 = walk, 4 = work)
-  * `<Door>`: State of Door (0 = closed, 1 = open)
-  * `<Win>`: State of Window (0 = closed, 1 = open)
+---
